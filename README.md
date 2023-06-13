@@ -1,6 +1,6 @@
 # Python Package Pipeline
 
-Esta librería contiene funciones para el manejo de tareas en procesamiento paralelo con multiprocessing asincrónico
+Esta librería contiene implementaciones de librerías para realizar conexiones http, socket, etc. y mantenerse agnóstico a la librería utilizada ya que cada implementación, hereda las funciones obligatorias de una clase abstracta.
 
 
 
@@ -42,7 +42,25 @@ git push --delete origin <tag>      # Subir tag a repositorio remoto
 
 ```bash
 pipenv install git+https://github.com/lcastiglione/pp-pipeline#egg=pipeline
+```
 
 
 
 ## Ejemplo de uso
+
+```python
+from pipeline import AiohttpClient, http_exceptions
+
+client = AiohttpClient()
+url = 'http://test.com'
+data = {'test': 'data'}
+response = await client.post(url, data=data)
+...
+url = 'http://test.com/file'
+response = await self.client.get(url, chunk_size=1024)
+stream=response()
+binay_data = [chunk async for chunk in stream]
+...
+client.close()
+```
+
