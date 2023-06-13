@@ -41,7 +41,7 @@ git push --delete origin <tag>      # Subir tag a repositorio remoto
 ## Instalación
 
 ```bash
-pipenv install git+https://github.com/lcastiglione/pp-pipeline#egg=pipeline
+pipenv install git+https://github.com/lcastiglione/pp-pipeline@<tag>#egg=pipeline
 ```
 
 
