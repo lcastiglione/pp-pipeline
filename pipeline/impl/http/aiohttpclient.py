@@ -21,7 +21,7 @@ class AiohttpClient(AbstractHttpClient):
                        url: str,
                        chunk_size: int = 0,
                        **kwargs: Any) -> Union[Dict, str, Callable]:
-        response=None
+        response = None
         try:
             response = await self._session.request(method, url, **kwargs)
             response.raise_for_status()
@@ -32,23 +32,22 @@ class AiohttpClient(AbstractHttpClient):
 
             content_type = response.headers['Content-Type']
             if content_type == 'application/json':
-                result= await response.json() # Devuelve un objeto JSON
+                result = await response.json()  # Devuelve un objeto JSON
             else:
-                result= await response.text() # Devuelve un string por defecto
+                result = await response.text()  # Devuelve un string por defecto
             await response.release()
             return result
         except Exception as exc:
             if response:
                 await response.release()
-            raise ResponseHTTPException(str(exc),url, method) from exc
+            raise ResponseHTTPException(str(exc), url, method) from exc
 
-    async def _requests_stream(self, response: aiohttp.ClientResponse, chunk_size:int) -> AsyncGenerator[bytes, None]:
+    async def _requests_stream(self, response: aiohttp.ClientResponse, chunk_size: int) -> AsyncGenerator[bytes, None]:
         try:
             async for chunk in response.content.iter_chunked(chunk_size):
                 yield chunk
         finally:
             await response.release()
-
 
     async def get(self, url: str, params: Optional[Dict[str, Any]] = None, **kwargs: Any) -> Any:
         return await self._request('GET', url, params=params, **kwargs)
@@ -62,7 +61,7 @@ class AiohttpClient(AbstractHttpClient):
     async def delete(self, url: str, **kwargs: Any) -> Any:
         return await self._request('DELETE', url, **kwargs)
 
-    async def close(self):
+    async def close(self) -> None:
         """Cierra la sesión
         """
         await self._session.close()
