@@ -14,7 +14,13 @@ class AiohttpClient(AbstractHttpClient):
     """
 
     def __init__(self):
-        self._session = aiohttp.ClientSession()
+        self._session = None
+
+    async def _get_session(self) -> aiohttp.ClientSession:
+        """Obtener (o crear) la sesión actual."""
+        if self._session is None:
+            self._session = aiohttp.ClientSession()
+        return self._session
 
     async def _request(self,
                        method: str,
@@ -23,15 +29,15 @@ class AiohttpClient(AbstractHttpClient):
                        **kwargs: Any) -> Union[Dict, str, Callable]:
         response = None
         try:
-            response = await self._session.request(method, url, **kwargs)
+            session=await self._get_session()
+            response = await session.request(method, url, **kwargs)
             response.raise_for_status()
 
             if chunk_size > 0:
                 # Devuelve una función generadora para que el usuario la itere
                 return lambda: self._requests_stream(response, chunk_size)
-
             content_type = response.headers['Content-Type']
-            if content_type == 'application/json':
+            if 'application/json' in content_type:
                 result = await response.json()  # Devuelve un objeto JSON
             else:
                 result = await response.text()  # Devuelve un string por defecto
@@ -61,7 +67,14 @@ class AiohttpClient(AbstractHttpClient):
     async def delete(self, url: str, **kwargs: Any) -> Any:
         return await self._request('DELETE', url, **kwargs)
 
+    async def get_session_cookies(self) -> Dict[str, str]:
+        """Obtiene las cookies de la sesión actual."""
+        session=await self._get_session()
+        return {cookie.key: cookie.value for cookie in session.cookie_jar}
+
     async def close(self) -> None:
         """Cierra la sesión
         """
-        await self._session.close()
+        session=await self._get_session()
+        if session:
+            await session.close()
