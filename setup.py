@@ -10,7 +10,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name='pipeline',
-    version='0.0.1',
+    version='0.0.3',
     author='Ing. Leonardo Castiglione',
     author_email='',
     description='Paquete con funciones para el manejo de peticiones web asíncronas, independizándose de la librería',

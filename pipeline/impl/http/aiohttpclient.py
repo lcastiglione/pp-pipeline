@@ -1,5 +1,6 @@
 ﻿"""Módulo con la implementación para hacer peticiones http asincríncas con la librería aiohttp"""
 
+import traceback
 from typing import Any, Dict, Optional, Union, AsyncGenerator, Callable
 import aiohttp
 from pipeline.core.http.exceptions import ResponseHTTPException
@@ -44,6 +45,8 @@ class AiohttpClient(AbstractHttpClient):
             await response.release()
             return result
         except Exception as exc:
+            #print(exc)
+            #traceback.print_exception(exc)
             if response:
                 await response.release()
             raise ResponseHTTPException(str(exc), url, method) from exc
@@ -75,6 +78,6 @@ class AiohttpClient(AbstractHttpClient):
     async def close(self) -> None:
         """Cierra la sesión
         """
-        session=await self._get_session()
-        if session:
-            await session.close()
+        if self._session:
+            await self._session.close()
+            self._session=None
